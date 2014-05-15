@@ -110,6 +110,7 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
     {
         this.project.closeNextStep();
         this.render(); 
+        app.addNewProject(this.project);
     }
     
     render() : Backbone.View<StepMapProject> 
@@ -192,7 +193,7 @@ class StepMapApp
                   this.$("#project-list").append(smpv.render().el);  
                 }
             
-                for(var i=0;i<17 - coll.models.length;i++)
+                for(var i=0;i<7 - coll.models.length;i++)
                 {
                     var smnpv = new StepMapNewProjectView();
                     this.$("#project-list").append(smnpv.render().el);

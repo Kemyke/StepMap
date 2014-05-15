@@ -100,6 +100,7 @@ var StepMapProjectView = (function (_super) {
     StepMapProjectView.prototype.closeStep = function () {
         this.project.closeNextStep();
         this.render();
+        app.addNewProject(this.project);
     };
 
     StepMapProjectView.prototype.render = function () {
@@ -169,7 +170,7 @@ var StepMapApp = (function () {
                     this.$("#project-list").append(smpv.render().el);
                 }
 
-                for (var i = 0; i < 17 - coll.models.length; i++) {
+                for (var i = 0; i < 7 - coll.models.length; i++) {
                     var smnpv = new StepMapNewProjectView();
                     this.$("#project-list").append(smnpv.render().el);
                 }

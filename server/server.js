@@ -70,6 +70,7 @@ function postProject(req, res, next) {
   project.badpoint = req.params.badpoint;
   project.goodpoint = req.params.goodpoint;
   project.nextstep = req.params.nextstep;
+  project.completedsteps = req.params.completedsteps;
   project.save(function () {
     res.send(req.body);
   });
@@ -87,9 +88,28 @@ function delProject(req, res, next) {
 	  });
 	}
 
+function putProject(req, res, next) {
+	  res.header("Access-Control-Allow-Origin", "*");
+	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	  // Create a new message model, fill it up and save it to Mongodb
+	  Project.findOne({_id: req.params._id}, function(err, mymodel) {
+		  mymodel.id = req.params.id;
+		  mymodel.name = req.params.name;
+		  mymodel.startdate = req.params.startdate;
+		  mymodel.badpoint = req.params.badpoint;
+		  mymodel.goodpoint = req.params.goodpoint;
+		  mymodel.nextstep = req.params.nextstep;
+		  mymodel.completedsteps = req.params.completedsteps;
+		  mymodel.save(function () {
+	    res.send(req.body);
+	  });
+	});
+}
+
 // Set up our routes and start the server
 server.get('/projects', getProjects);
 server.post('/projects', postProject);
 server.del('/projects/:_id', delProject);
+server.put('/projects/:_id', putProject);
 server.listen(8080);
 
