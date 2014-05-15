@@ -7,10 +7,8 @@ class StepMapStep
     name : string;
     deadline : Date;
     sentreminders: number;
-    project: StepMapProject;
     
-    constructor(project : StepMapProject) {
-            this.project = project;
+    constructor() {
             this.name = "Fill next step";
             this.deadline = new Date();
             this.sentreminders = 0;
@@ -20,7 +18,6 @@ class StepMapStep
     {
         //TODO:send e-mail
         this.sentreminders = this.sentreminders + 1;
-        this.project.reminderSent();
     }
 }
 
@@ -30,7 +27,7 @@ class StepMapProject extends Backbone.Model
         return {
             name: "defname",
             startdate: new Date(),
-            nextstep: new StepMapStep(this),
+            nextstep: new StepMapStep(),
             badpoint: 0,
             goodpoint: 1,
             completedsteps: new Array<StepMapStep>()
@@ -38,12 +35,25 @@ class StepMapProject extends Backbone.Model
     }
     
     initialize() {
+        this.idAttribute = "_id";
+        
         if (!this.get("name")) {
             this.set({ "name": this.defaults().name });
         }
         if (!this.get("startdate")) {
             this.set({ "startdate": this.defaults().startdate });
-
+        }
+        if (!this.get("nextstep")) {
+            this.set({ "nextstep": this.defaults().nextstep });
+        }
+        if (!this.get("badpoint")) {
+            this.set({ "badpoint": this.defaults().badpoint });
+        }
+        if (!this.get("badpoint")) {
+            this.set({ "badpoint": this.defaults().badpoint });
+        }
+        if (!this.get("completedsteps")) {
+            this.set({ "completedsteps": this.defaults().completedsteps });
         }
     }
     
@@ -63,7 +73,7 @@ class StepMapProject extends Backbone.Model
     closeNextStep()
     {
         this.get("completedsteps").push(this.get("nextstep"));
-        this.set("nextstep", new StepMapStep(this));
+        this.set("nextstep", new StepMapStep());
         this.set("goodpoint", this.get("goodpoint") + 1);
     }
     
@@ -93,6 +103,7 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
         this.el.remove(); 
         var smnpv = new StepMapNewProjectView();
         $("#project-list").append(smnpv.render().el);
+        app.removeProject(this.project);
     }
     
     closeStep()
@@ -136,7 +147,6 @@ class StepMapNewProjectView extends Backbone.View<Backbone.Model>
     constructor() 
     {
         this.events = <any>{ "click #newProject": this.createNewProject};
-        
         super();
         
         this.template = _.template($('#new-project-template').html());
@@ -144,16 +154,14 @@ class StepMapNewProjectView extends Backbone.View<Backbone.Model>
 
     createNewProject() 
     { 
-        try
-        {
         this.el.remove();  
-        var smpv = new StepMapProjectView(new StepMapProject());
+        var Project =  StepMapProject.extend({
+                                            url:'http://localhost:8080/projects',
+                                            idAttribute:'_id'});
+        var project = new Project();
+        var smpv = new StepMapProjectView(project);
         $("#project-list").append(smpv.render().el);
-        }
-        catch(ex)
-        {
-            var i = 0;
-        } 
+        app.addNewProject(project);
     }
     
     render() : Backbone.View<Backbone.Model> 
@@ -170,8 +178,9 @@ class StepMapApp
     constructor()
     {
         var Projects = Backbone.Collection.extend({
-                    model:StepMapProject,
-                    url:'http://localhost:8080/projects'
+                    model:StepMapProject.extend({idAttribute:'_id'}),
+                    url:'http://localhost:8080/projects',
+        
                 });
             
         var coll = new Projects();
@@ -183,7 +192,7 @@ class StepMapApp
                   this.$("#project-list").append(smpv.render().el);  
                 }
             
-                for(var i=0;i<7 - coll.models.length;i++)
+                for(var i=0;i<17 - coll.models.length;i++)
                 {
                     var smnpv = new StepMapNewProjectView();
                     this.$("#project-list").append(smnpv.render().el);
@@ -192,9 +201,15 @@ class StepMapApp
         });
     }
     
-    addNewProject()
-    {            
+    addNewProject(project : StepMapProject)
+    {     
+        project.save();       
+    }
+    
+    removeProject(project : StepMapProject)
+    {
+        project.destroy();
     }
 }
 
-$(() => { var app = new StepMapApp(); });
+var app = new StepMapApp();
