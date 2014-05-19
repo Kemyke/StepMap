@@ -96,7 +96,7 @@ var StepMapProjectView = (function (_super) {
     }
     StepMapProjectView.prototype.terminate = function () {
         this.el.remove();
-        var smnpv = new StepMapNewProjectView(this.project.get("position"));
+        var smnpv = new StepMapNewProjectView(this.project.get("position") - 1);
         $("#project-list").append(smnpv.render().el);
         this.project.destroy();
     };
@@ -108,23 +108,18 @@ var StepMapProjectView = (function (_super) {
     };
 
     StepMapProjectView.prototype.render = function () {
-        try  {
-            var diffInMs = new Date(Date.now()).getDate() - new Date(this.project.get("startdate")).getDate();
-            var diffInDays = Math.ceil(diffInMs / (1000 * 3600 * 24));
-            var templateData = { projectname: this.project.get("name"), nextstep: this.project.get("nextstep").name, deadline: this.project.get("nextstep").deadline, goods: this.project.get("goodpoint"), bads: this.project.get("badpoint"), days: diffInDays };
-
-            this.$el.html(this.template(templateData));
-
-            //            var td = $(this.content).find("#progress");
-            var cs = this.project.get("completedsteps");
-            var csl = 0;
-            if (cs) {
-                csl = cs.length * 10;
-            }
-            this.$("#progress").width(csl);
-        } catch (ex) {
-            var i = 0;
+        var cs = this.project.get("completedsteps");
+        var csl = 0;
+        if (cs) {
+            csl = cs.length * 10;
         }
+
+        var diffInMs = new Date(Date.now()).getDate() - new Date(this.project.get("startdate")).getDate();
+        var diffInDays = Math.ceil(diffInMs / (1000 * 3600 * 24));
+        var templateData = { projectname: this.project.get("name"), progresswidth: csl, nextstep: this.project.get("nextstep").name, deadline: this.project.get("nextstep").deadline, goods: this.project.get("goodpoint"), bads: this.project.get("badpoint"), days: diffInDays };
+
+        this.$el.html(this.template(templateData));
+
         return this;
     };
     return StepMapProjectView;
