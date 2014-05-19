@@ -9,14 +9,13 @@ Schema = mongoose.Schema;
 
 // Create a schema for our data
 var ProjectSchema = new Schema({
-  id: Number,
+  position: Number,
   name: String,
   startdate: Date,    
   goodpoint: Number,
   badpoint: Number,
   nextstep: 
 	   {
-		  id: Number,
 		  name: String,
 		  deadline: Date,    
 		  sentreminders: Number,
@@ -24,7 +23,6 @@ var ProjectSchema = new Schema({
 	   },
   completedsteps: 
 	   {
-		  id: Number,
 		  name: String,
 		  deadline: Date,
 	          finishdate: Date,    
@@ -66,6 +64,7 @@ function postProject(req, res, next) {
   var project = new Project();
   project.id = req.params.id;
   project.name = req.params.name;
+  project.position = req.params.position;
   project.startdate = req.params.startdate;
   project.badpoint = req.params.badpoint;
   project.goodpoint = req.params.goodpoint;
@@ -95,6 +94,7 @@ function putProject(req, res, next) {
 	  Project.findOne({_id: req.params._id}, function(err, mymodel) {
 		  mymodel.id = req.params.id;
 		  mymodel.name = req.params.name;
+		  mymodel.position = req.params.position;
 		  mymodel.startdate = req.params.startdate;
 		  mymodel.badpoint = req.params.badpoint;
 		  mymodel.goodpoint = req.params.goodpoint;

@@ -28,6 +28,7 @@ var StepMapProject = (function (_super) {
     StepMapProject.prototype.defaults = function () {
         return {
             name: "defname",
+            position: -1,
             startdate: new Date(),
             nextstep: new StepMapStep(),
             badpoint: 0,
@@ -56,6 +57,9 @@ var StepMapProject = (function (_super) {
         }
         if (!this.get("completedsteps")) {
             this.set({ "completedsteps": this.defaults().completedsteps });
+        }
+        if (!this.get("position")) {
+            this.set({ "position": this.defaults().position });
         }
     };
 
@@ -92,15 +96,15 @@ var StepMapProjectView = (function (_super) {
     }
     StepMapProjectView.prototype.terminate = function () {
         this.el.remove();
-        var smnpv = new StepMapNewProjectView();
+        var smnpv = new StepMapNewProjectView(this.project.get("position"));
         $("#project-list").append(smnpv.render().el);
-        app.removeProject(this.project);
+        this.project.destroy();
     };
 
     StepMapProjectView.prototype.closeStep = function () {
         this.project.closeNextStep();
         this.render();
-        app.addNewProject(this.project);
+        this.project.save();
     };
 
     StepMapProjectView.prototype.render = function () {
@@ -128,21 +132,23 @@ var StepMapProjectView = (function (_super) {
 
 var StepMapNewProjectView = (function (_super) {
     __extends(StepMapNewProjectView, _super);
-    function StepMapNewProjectView() {
+    function StepMapNewProjectView(position) {
+        this.id = "newprojectposition" + position;
         this.events = { "click #newProject": this.createNewProject };
         _super.call(this);
-
+        this.position = position;
         this.template = _.template($('#new-project-template').html());
     }
     StepMapNewProjectView.prototype.createNewProject = function () {
-        this.el.remove();
         var Project = StepMapProject.extend({
             url: 'http://localhost:8080/projects',
             idAttribute: '_id' });
         var project = new Project();
+        project.set("position", this.position);
         var smpv = new StepMapProjectView(project);
-        $("#project-list").append(smpv.render().el);
-        app.addNewProject(project);
+        $("#" + this.id).after(smpv.render().el);
+        this.el.remove();
+        project.save();
     };
 
     StepMapNewProjectView.prototype.render = function () {
@@ -165,25 +171,28 @@ var StepMapApp = (function () {
 
         coll.fetch({
             success: function () {
-                for (var model in coll.models) {
-                    var smpv = new StepMapProjectView(coll.models[model]);
-                    this.$("#project-list").append(smpv.render().el);
-                }
-
-                for (var i = 0; i < 7 - coll.models.length; i++) {
-                    var smnpv = new StepMapNewProjectView();
-                    this.$("#project-list").append(smnpv.render().el);
+                for (var i = 0; i < 7; i++) {
+                    try  {
+                        var selectedItem = coll.models.filter(function (item) {
+                            if (item)
+                                return item.get("position") == i + 1;
+                            else
+                                return false;
+                        });
+                        if (selectedItem.length == 1) {
+                            var smpv = new StepMapProjectView(selectedItem[0]);
+                            this.$("#project-list").append(smpv.render().el);
+                        } else {
+                            var smnpv = new StepMapNewProjectView(i + 1);
+                            this.$("#project-list").append(smnpv.render().el);
+                        }
+                    } catch (ex) {
+                        var x = 0;
+                    }
                 }
             }
         });
     }
-    StepMapApp.prototype.addNewProject = function (project) {
-        project.save();
-    };
-
-    StepMapApp.prototype.removeProject = function (project) {
-        project.destroy();
-    };
     return StepMapApp;
 })();
 

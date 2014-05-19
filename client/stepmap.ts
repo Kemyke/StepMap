@@ -26,6 +26,7 @@ class StepMapProject extends Backbone.Model
     defaults() {
         return {
             name: "defname",
+            position: -1,
             startdate: new Date(),
             nextstep: new StepMapStep(),
             badpoint: 0,
@@ -54,6 +55,9 @@ class StepMapProject extends Backbone.Model
         }
         if (!this.get("completedsteps")) {
             this.set({ "completedsteps": this.defaults().completedsteps });
+        }
+        if (!this.get("position")) {
+            this.set({ "position": this.defaults().position });
         }
     }
     
@@ -101,16 +105,16 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
     terminate()
     {
         this.el.remove(); 
-        var smnpv = new StepMapNewProjectView();
+        var smnpv = new StepMapNewProjectView(this.project.get("position"));
         $("#project-list").append(smnpv.render().el);
-        app.removeProject(this.project);
+        this.project.destroy();
     }
     
     closeStep()
     {
         this.project.closeNextStep();
         this.render(); 
-        app.addNewProject(this.project);
+        this.project.save();
     }
     
     render() : Backbone.View<StepMapProject> 
@@ -145,24 +149,28 @@ class StepMapNewProjectView extends Backbone.View<Backbone.Model>
 {
     template: (data: any) => string;
     
-    constructor() 
+    position: number;
+    
+    constructor(position : number) 
     {
+        this.id = "newprojectposition" + position;
         this.events = <any>{ "click #newProject": this.createNewProject};
         super();
-        
+        this.position = position;
         this.template = _.template($('#new-project-template').html());
     }
 
     createNewProject() 
     { 
-        this.el.remove();  
         var Project =  StepMapProject.extend({
                                             url:'http://localhost:8080/projects',
                                             idAttribute:'_id'});
         var project = new Project();
+        project.set("position", this.position);
         var smpv = new StepMapProjectView(project);
-        $("#project-list").append(smpv.render().el);
-        app.addNewProject(project);
+        $("#"+this.id).after(smpv.render().el);
+        this.el.remove();  
+        project.save();
     }
     
     render() : Backbone.View<Backbone.Model> 
@@ -187,29 +195,31 @@ class StepMapApp
         var coll = new Projects();
         
         coll.fetch({success: function(){
-                for(var model in coll.models)
+
+                for(var i=0;i<7;i++)
                 {
-                  var smpv = new StepMapProjectView(coll.models[model]);
-                  this.$("#project-list").append(smpv.render().el);  
-                }
-            
-                for(var i=0;i<7 - coll.models.length;i++)
-                {
-                    var smnpv = new StepMapNewProjectView();
-                    this.$("#project-list").append(smnpv.render().el);
+                    try
+                    {
+                    var selectedItem = coll.models.filter(function(item){ if(item) return item.get("position") == i+1; else return false; });
+                    if(selectedItem.length == 1)
+                    {
+                        var smpv = new StepMapProjectView(selectedItem[0]);
+                        this.$("#project-list").append(smpv.render().el);  
+
+                    }
+                    else
+                    {
+                        var smnpv = new StepMapNewProjectView(i+1);
+                        this.$("#project-list").append(smnpv.render().el);
+                    }
+                    }
+                    catch(ex)
+                    {
+                        var x = 0;
+                    }
                 }   
             }
         });
-    }
-    
-    addNewProject(project : StepMapProject)
-    {     
-        project.save();       
-    }
-    
-    removeProject(project : StepMapProject)
-    {
-        project.destroy();
     }
 }
 
