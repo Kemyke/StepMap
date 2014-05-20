@@ -87,6 +87,7 @@ var StepMapProject = (function (_super) {
 var StepMapProjectView = (function (_super) {
     __extends(StepMapProjectView, _super);
     function StepMapProjectView(project) {
+        this.id = "projectposition" + project.get("position");
         this.events = { "click #terminate": this.terminate, "click #closeStep": this.closeStep };
 
         _super.call(this);
@@ -95,9 +96,9 @@ var StepMapProjectView = (function (_super) {
         this.template = _.template($('#project-template').html());
     }
     StepMapProjectView.prototype.terminate = function () {
+        var smnpv = new StepMapNewProjectView(this.project.get("position"));
+        $("#" + this.id).after(smnpv.render().el);
         this.el.remove();
-        var smnpv = new StepMapNewProjectView(this.project.get("position") - 1);
-        $("#project-list").append(smnpv.render().el);
         this.project.destroy();
     };
 
@@ -116,7 +117,7 @@ var StepMapProjectView = (function (_super) {
 
         var diffInMs = new Date(Date.now()).getDate() - new Date(this.project.get("startdate")).getDate();
         var diffInDays = Math.ceil(diffInMs / (1000 * 3600 * 24));
-        var templateData = { projectname: this.project.get("name"), progresswidth: csl, nextstep: this.project.get("nextstep").name, deadline: this.project.get("nextstep").deadline, goods: this.project.get("goodpoint"), bads: this.project.get("badpoint"), days: diffInDays };
+        var templateData = { projectname: this.project.get("name"), progresswidth: csl, nextstep: this.project.get("nextstep").name, deadline: new Date(this.project.get("nextstep").deadline).toLocaleDateString(), goods: this.project.get("goodpoint"), bads: this.project.get("badpoint"), days: diffInDays };
 
         this.$el.html(this.template(templateData));
 
@@ -174,12 +175,18 @@ var StepMapApp = (function () {
                             else
                                 return false;
                         });
-                        if (selectedItem.length == 1) {
-                            var smpv = new StepMapProjectView(selectedItem[0]);
-                            this.$("#project-list").append(smpv.render().el);
-                        } else {
+                        if (selectedItem.length == 0) {
                             var smnpv = new StepMapNewProjectView(i + 1);
                             this.$("#project-list").append(smnpv.render().el);
+                        } else {
+                            for (var mp in selectedItem) {
+                                if (mp == 0) {
+                                    var smpv = new StepMapProjectView(selectedItem[0]);
+                                    this.$("#project-list").append(smpv.render().el);
+                                } else {
+                                    selectedItem[mp].destroy();
+                                }
+                            }
                         }
                     } catch (ex) {
                         var x = 0;
