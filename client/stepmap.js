@@ -101,6 +101,9 @@ var StepMapProjectView = (function (_super) {
         this.project = project;
 
         this.template = _.template($('#project-template').html());
+
+        _.bindAll(this, 'render');
+        this.project.bind('change', this.render);
     }
     StepMapProjectView.prototype.editNextStepName = function () {
         this.$('.step').addClass("editing");
@@ -108,6 +111,7 @@ var StepMapProjectView = (function (_super) {
     };
 
     StepMapProjectView.prototype.closeEditNextStepName = function () {
+        this.project.save({ "nextstep": { "name": this.$('.nextstep-name-input').val() } });
         this.$('.step').removeClass("editing");
     };
 
@@ -117,6 +121,7 @@ var StepMapProjectView = (function (_super) {
     };
 
     StepMapProjectView.prototype.closeEditProjectName = function () {
+        this.project.save({ name: this.$('.project-name-input').val() });
         this.$('.project').removeClass("editing");
     };
 

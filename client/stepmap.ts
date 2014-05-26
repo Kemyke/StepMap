@@ -108,6 +108,9 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
         this.project = project;
         
         this.template = _.template($('#project-template').html());
+        
+        _.bindAll(this, 'render');
+        this.project.bind('change', this.render);
     }
 
     editNextStepName()
@@ -118,6 +121,7 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
 
     closeEditNextStepName()
     {
+        this.project.save({ "nextstep": { "name": this.$('.nextstep-name-input').val() }});
         this.$('.step').removeClass("editing");
     }
     
@@ -129,6 +133,7 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
 
     closeEditProjectName()
     {
+        this.project.save({ name: this.$('.project-name-input').val() });
         this.$('.project').removeClass("editing");
     }
 
