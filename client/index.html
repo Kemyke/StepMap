@@ -3,6 +3,7 @@
 
   <head>
     <title>Step Map</title>
+    <link href="css/stepmap.css" media="all" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.1.min.js"></script>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
     <script type="text/javascript" src="http://backbonejs.org/backbone.js"></script> 
@@ -19,14 +20,26 @@
   	      	<td id="progress" width="<%= progresswidth %>"/>
   	      	<td>
 		      <div class="project" style="border: 1px solid green;display: inline-block;">
-		          <label id="project-name"><%= projectname %></label>
+		      	  <div class="display">
+		            <label id="project-name"><%= projectname %></label>
+		          </div>
+                  <div class="edit">
+          			<input class="project-name-input" type="text" value="<%= projectname %>" />
+        		  </div>
+        		  
 		          <button id="terminate">Terminate</button>
 		          <label id="days"><%= days %>d</label>
 		          <label id="goods" style="color: green;"><%= goods %></label>
 		          <label id="bads" style="color: red;"><%= bads %></label>
 		      </div>
 		      <div class="step" style="border: 1px solid yellow;display: inline-block;">
-		          <label id="nextStep"><%= nextstep %></label>
+  		      	  <div class="display">		      
+		          	<label id="nextStep"><%= nextstep %></label>
+		          </div>
+                  <div class="edit">
+          			<input class="nextstep-name-input" type="text" value="<%= nextstep %>" />
+        		  </div>
+        		  
 		          <label id="deadline"><%= deadline %></label>
 		          <button id="closeStep">Close step</button>
 		      </div>

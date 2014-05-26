@@ -88,13 +88,38 @@ var StepMapProjectView = (function (_super) {
     __extends(StepMapProjectView, _super);
     function StepMapProjectView(project) {
         this.id = "projectposition" + project.get("position");
-        this.events = { "click #terminate": this.terminate, "click #closeStep": this.closeStep };
+        this.events = {
+            "click #terminate": this.terminate,
+            "click #closeStep": this.closeStep,
+            "dblclick #project-name": this.editProjectName,
+            "blur .project-name-input": this.closeEditProjectName,
+            "dblclick #nextStep": this.editNextStepName,
+            "blur .nextstep-name-input": this.closeEditNextStepName
+        };
 
         _super.call(this);
         this.project = project;
 
         this.template = _.template($('#project-template').html());
     }
+    StepMapProjectView.prototype.editNextStepName = function () {
+        this.$('.step').addClass("editing");
+        this.$('.nextstep-name-input').focus();
+    };
+
+    StepMapProjectView.prototype.closeEditNextStepName = function () {
+        this.$('.step').removeClass("editing");
+    };
+
+    StepMapProjectView.prototype.editProjectName = function () {
+        this.$('.project').addClass("editing");
+        this.$('.project-name-input').focus();
+    };
+
+    StepMapProjectView.prototype.closeEditProjectName = function () {
+        this.$('.project').removeClass("editing");
+    };
+
     StepMapProjectView.prototype.terminate = function () {
         var smnpv = new StepMapNewProjectView(this.project.get("position"));
         $("#" + this.id).after(smnpv.render().el);

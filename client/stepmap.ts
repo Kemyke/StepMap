@@ -95,13 +95,43 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
     constructor(project: StepMapProject) 
     {
         this.id = "projectposition" + project.get("position");
-        this.events = <any>{ "click #terminate": this.terminate, "click #closeStep": this.closeStep};
+        this.events = <any>{ "click #terminate": this.terminate, 
+                             "click #closeStep": this.closeStep, 
+                             "dblclick #project-name": this.editProjectName, 
+                             "blur .project-name-input": this.closeEditProjectName,
+                             "dblclick #nextStep": this.editNextStepName, 
+                             "blur .nextstep-name-input": this.closeEditNextStepName
+                             
+        };
         
         super();
         this.project = project;
         
         this.template = _.template($('#project-template').html());
     }
+
+    editNextStepName()
+    {
+        this.$('.step').addClass("editing");
+        this.$('.nextstep-name-input').focus();
+    }
+
+    closeEditNextStepName()
+    {
+        this.$('.step').removeClass("editing");
+    }
+    
+    editProjectName()
+    {
+        this.$('.project').addClass("editing");
+        this.$('.project-name-input').focus();
+    }
+
+    closeEditProjectName()
+    {
+        this.$('.project').removeClass("editing");
+    }
+
     
     terminate()
     {
