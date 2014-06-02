@@ -150,7 +150,15 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
     {
         this.project.closeNextStep();
         this.render(); 
-        this.project.save();
+        this.project.save(null, {
+                wait:true,
+                success:function(model, response) {
+                    console.log('Successfully saved!');
+                },
+                error: function(model, error) {
+                    console.log(model.toJSON());
+                    console.log('error.responseText');
+                }});
     }
     
     render() : Backbone.View<StepMapProject> 
@@ -185,20 +193,34 @@ class StepMapNewProjectView extends Backbone.View<Backbone.Model>
         super();
         this.position = position;
         this.template = _.template($('#new-project-template').html());
+        
+        _.bindAll(this, 'render', 'saveProject');
     }
 
     createNewProject() 
     { 
         var Project =  StepMapProject.extend({
-                                            url:'http://localhost:8080/projects',
+                                            urlRoot:'http://localhost:8080/projects',
                                             idAttribute:'_id'});
         var project = new Project();
         project.set("position", this.position);
-        var smpv = new StepMapProjectView(project);
-        $("#"+this.id).after(smpv.render().el);
-        this.el.remove();  
-        project.save();
+        project.save(null, {
+                wait:true,
+                success:this.saveProject,
+                error: function(model, error) {
+                    console.log(model.toJSON());
+                    console.log('error.responseText');
+                }});
     }
+    
+    saveProject(model, response) {
+                    var smpv = new StepMapProjectView(model);
+                    $("#"+this.id).after(smpv.render().el);
+                    this.el.remove();  
+                    app.coll.add(model);
+
+                    console.log('Successfully saved!');
+                }
     
     render() : Backbone.View<Backbone.Model> 
     {
@@ -211,23 +233,24 @@ class StepMapNewProjectView extends Backbone.View<Backbone.Model>
 
 class StepMapApp
 {
+    coll : any;
+    
     constructor()
     {
         var Projects = Backbone.Collection.extend({
                     model:StepMapProject.extend({idAttribute:'_id'}),
                     url:'http://localhost:8080/projects',
-        
                 });
             
-        var coll = new Projects();
-        
-        coll.fetch({success: function(){
+        this.coll = new Projects();
+        var c = this.coll;
+        this.coll.fetch({success: function(){
 
                 for(var i=0;i<7;i++)
                 {
                     try
                     {
-                    var selectedItem = coll.models.filter(function(item){ if(item) return item.get("position") == i+1; else return false; });
+                    var selectedItem = c.models.filter(function(item){ if(item) return item.get("position") == i+1; else return false; });
                     if(selectedItem.length == 0)
                     {
                         var smnpv = new StepMapNewProjectView(i+1);

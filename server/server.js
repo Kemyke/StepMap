@@ -71,7 +71,7 @@ function postProject(req, res, next) {
   project.nextstep = req.params.nextstep;
   project.completedsteps = req.params.completedsteps;
   project.save(function () {
-    res.send(req.body);
+    res.send(project);
   });
 }
 
@@ -106,10 +106,18 @@ function putProject(req, res, next) {
 	});
 }
 
+function putProjectsWTF(req, res, next) {
+	  res.header("Access-Control-Allow-Origin", "*");
+	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	  
+	  res.send(req.body);
+}
+
 // Set up our routes and start the server
 server.get('/projects', getProjects);
 server.post('/projects', postProject);
 server.del('/projects/:_id', delProject);
 server.put('/projects/:_id', putProject);
+server.put('/projects/', putProjectsWTF);
 server.listen(8080);
 

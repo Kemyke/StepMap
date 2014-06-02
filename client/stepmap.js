@@ -135,7 +135,15 @@ var StepMapProjectView = (function (_super) {
     StepMapProjectView.prototype.closeStep = function () {
         this.project.closeNextStep();
         this.render();
-        this.project.save();
+        this.project.save(null, {
+            wait: true,
+            success: function (model, response) {
+                console.log('Successfully saved!');
+            },
+            error: function (model, error) {
+                console.log(model.toJSON());
+                console.log('error.responseText');
+            } });
     };
 
     StepMapProjectView.prototype.render = function () {
@@ -164,17 +172,31 @@ var StepMapNewProjectView = (function (_super) {
         _super.call(this);
         this.position = position;
         this.template = _.template($('#new-project-template').html());
+
+        _.bindAll(this, 'render', 'saveProject');
     }
     StepMapNewProjectView.prototype.createNewProject = function () {
         var Project = StepMapProject.extend({
-            url: 'http://localhost:8080/projects',
+            urlRoot: 'http://localhost:8080/projects',
             idAttribute: '_id' });
         var project = new Project();
         project.set("position", this.position);
-        var smpv = new StepMapProjectView(project);
+        project.save(null, {
+            wait: true,
+            success: this.saveProject,
+            error: function (model, error) {
+                console.log(model.toJSON());
+                console.log('error.responseText');
+            } });
+    };
+
+    StepMapNewProjectView.prototype.saveProject = function (model, response) {
+        var smpv = new StepMapProjectView(model);
         $("#" + this.id).after(smpv.render().el);
         this.el.remove();
-        project.save();
+        app.coll.add(model);
+
+        console.log('Successfully saved!');
     };
 
     StepMapNewProjectView.prototype.render = function () {
@@ -193,13 +215,13 @@ var StepMapApp = (function () {
             url: 'http://localhost:8080/projects'
         });
 
-        var coll = new Projects();
-
-        coll.fetch({
+        this.coll = new Projects();
+        var c = this.coll;
+        this.coll.fetch({
             success: function () {
                 for (var i = 0; i < 7; i++) {
                     try  {
-                        var selectedItem = coll.models.filter(function (item) {
+                        var selectedItem = c.models.filter(function (item) {
                             if (item)
                                 return item.get("position") == i + 1;
                             else
