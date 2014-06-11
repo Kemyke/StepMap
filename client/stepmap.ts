@@ -95,6 +95,7 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
     constructor(project: StepMapProject) 
     {
         this.id = "projectposition" + project.get("position");
+        this.className= "projectcontainer";
         this.events = <any>{ "click #terminate": this.terminate, 
                              "click #closeStep": this.closeStep, 
                              "dblclick #project-name": this.editProjectName, 
@@ -189,6 +190,7 @@ class StepMapNewProjectView extends Backbone.View<Backbone.Model>
     constructor(position : number) 
     {
         this.id = "newprojectposition" + position;
+        this.className= "newprojectcontainer";
         this.events = <any>{ "click #newProject": this.createNewProject};
         super();
         this.position = position;

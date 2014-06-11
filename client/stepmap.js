@@ -88,6 +88,7 @@ var StepMapProjectView = (function (_super) {
     __extends(StepMapProjectView, _super);
     function StepMapProjectView(project) {
         this.id = "projectposition" + project.get("position");
+        this.className = "projectcontainer";
         this.events = {
             "click #terminate": this.terminate,
             "click #closeStep": this.closeStep,
@@ -168,6 +169,7 @@ var StepMapNewProjectView = (function (_super) {
     __extends(StepMapNewProjectView, _super);
     function StepMapNewProjectView(position) {
         this.id = "newprojectposition" + position;
+        this.className = "newprojectcontainer";
         this.events = { "click #newProject": this.createNewProject };
         _super.call(this);
         this.position = position;

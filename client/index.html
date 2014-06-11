@@ -11,47 +11,36 @@
   </head>
 
   <body>
-  <div id="projectContainer">
-  </div>
   <ul id="project-list"></ul>
   <script type="text/template" id="project-template">
-  	  <table>
-  	      <tr>
-  	      	<td id="progress" width="<%= progresswidth %>"/>
-  	      	<td>
-		      <div class="project" style="border: 1px solid green;display: inline-block;">
-		      	  <div class="display">
-		            <label id="project-name"><%= projectname %></label>
-		          </div>
-                  <div class="edit">
-          			<input class="project-name-input" type="text" value="<%= projectname %>" />
-        		  </div>
-        		  
-		          <button id="terminate">Terminate</button>
-		          <label id="days"><%= days %>d</label>
-		          <label id="goods" style="color: green;"><%= goods %></label>
-		          <label id="bads" style="color: red;"><%= bads %></label>
-		      </div>
-		      <div class="step" style="border: 1px solid yellow;display: inline-block;">
-  		      	  <div class="display">		      
-		          	<label id="nextStep"><%= nextstep %></label>
-		          </div>
-                  <div class="edit">
-          			<input class="nextstep-name-input" type="text" value="<%= nextstep %>" />
-        		  </div>
-        		  
-		          <label id="deadline"><%= deadline %></label>
-		          <button id="closeStep">Close step</button>
-		      </div>
-		    </td>
-	      </tr>
-	   </table>
+      <div class="step" style="border: 1px solid yellow;position: relative;top: -<%= progresswidth %>px;">
+      	  <div class="display">		      
+          	<label id="nextStep"><%= nextstep %></label>
+          </div>
+          <div class="edit">
+  			<input class="nextstep-name-input" type="text" value="<%= nextstep %>" />
+		  </div>
+		  
+          <label id="deadline"><%= deadline %></label>
+          <button id="closeStep">Close step</button>
+      </div>
+      <div class="project" style="border: 1px solid green;position: relative;top: -<%= progresswidth %>px;">
+      	  <div class="display">
+            <label id="project-name"><%= projectname %></label>
+          </div>
+          <div class="edit">
+  			<input class="project-name-input" type="text" value="<%= projectname %>" />
+		  </div>
+		  
+          <button id="terminate">Terminate</button>
+          <label id="days"><%= days %>d</label>
+          <label id="goods" style="color: green;"><%= goods %></label>
+          <label id="bads" style="color: red;"><%= bads %></label>
+      </div>      
     </script>
     
      <script type="text/template" id="new-project-template">
-     <div>
   	  <button id="newProject">New project</button>
-  	 </div>
     </script>
     
   </body>
