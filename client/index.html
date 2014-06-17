@@ -6,7 +6,9 @@
     <link href="css/stepmap.css" media="all" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.1.min.js"></script>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-    <script type="text/javascript" src="http://backbonejs.org/backbone.js"></script> 
+    <script type="text/javascript" src="http://backbonejs.org/backbone.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script> 
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
     <script type="text/javascript" src="stepmap.js"></script>
   </head>
 
@@ -14,15 +16,23 @@
   <ul id="project-list"></ul>
   <script type="text/template" id="project-template">
       <div class="step" style="border: 1px solid yellow;position: relative;top: -<%= progresswidth %>px;">
+      	<div class="stepname">
       	  <div class="display">		      
           	<label id="nextStep"><%= nextstep %></label>
           </div>
           <div class="edit">
   			<input class="nextstep-name-input" type="text" value="<%= nextstep %>" />
 		  </div>
-		  
-          <label id="deadline"><%= deadline %></label>
-          <button id="closeStep">Close step</button>
+		</div>
+		<div class="stepdeadline">  
+		  <div class="display">
+          	<label id="deadline"><%= deadline %></label>
+          </div>	
+          <div class="edit">
+  			<input class="nextstep-deadline-input" type="text" type="text" id="datepicker" value="<%= deadline %>" />
+		  </div>
+        </div>
+        <button id="closeStep">Close step</button>
       </div>
       <div class="project" style="border: 1px solid green;position: relative;top: -<%= progresswidth %>px;">
       	  <div class="display">

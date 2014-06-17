@@ -101,7 +101,9 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
                              "dblclick #project-name": this.editProjectName, 
                              "blur .project-name-input": this.closeEditProjectName,
                              "dblclick #nextStep": this.editNextStepName, 
-                             "blur .nextstep-name-input": this.closeEditNextStepName
+                             "blur .nextstep-name-input": this.closeEditNextStepName,
+                             "dblclick #deadline": this.editNextStepDeadline, 
+                             "blur .nextstep-deadline-input": this.closeEditNextStepDeadline
                              
         };
         
@@ -114,16 +116,32 @@ class StepMapProjectView extends Backbone.View<StepMapProject>
         this.project.bind('change', this.render);
     }
 
+    editNextStepDeadline()
+    {
+        this.$('.step .stepdeadline').addClass("editing");
+        this.$('.nextstep-deadline-input').focus();
+    }
+
+    closeEditNextStepDeadline()
+    {
+        this.project.get("nextstep").deadline = this.$('.nextstep-deadline-input').val();
+        this.project.save();
+        this.$('.step .stepdeadline').removeClass("editing");
+        this.render();
+    }
+    
     editNextStepName()
     {
-        this.$('.step').addClass("editing");
+        this.$('.step .stepname').addClass("editing");
         this.$('.nextstep-name-input').focus();
     }
 
     closeEditNextStepName()
     {
-        this.project.save({ "nextstep": { "name": this.$('.nextstep-name-input').val() }});
-        this.$('.step').removeClass("editing");
+        this.project.get("nextstep").name = this.$('.nextstep-name-input').val();
+        this.project.save();
+        this.$('.step .stepname').removeClass("editing");
+        this.render();
     }
     
     editProjectName()

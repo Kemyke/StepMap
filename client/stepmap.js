@@ -95,7 +95,9 @@ var StepMapProjectView = (function (_super) {
             "dblclick #project-name": this.editProjectName,
             "blur .project-name-input": this.closeEditProjectName,
             "dblclick #nextStep": this.editNextStepName,
-            "blur .nextstep-name-input": this.closeEditNextStepName
+            "blur .nextstep-name-input": this.closeEditNextStepName,
+            "dblclick #deadline": this.editNextStepDeadline,
+            "blur .nextstep-deadline-input": this.closeEditNextStepDeadline
         };
 
         _super.call(this);
@@ -106,14 +108,28 @@ var StepMapProjectView = (function (_super) {
         _.bindAll(this, 'render');
         this.project.bind('change', this.render);
     }
+    StepMapProjectView.prototype.editNextStepDeadline = function () {
+        this.$('.step .stepdeadline').addClass("editing");
+        this.$('.nextstep-deadline-input').focus();
+    };
+
+    StepMapProjectView.prototype.closeEditNextStepDeadline = function () {
+        this.project.get("nextstep").deadline = this.$('.nextstep-deadline-input').val();
+        this.project.save();
+        this.$('.step .stepdeadline').removeClass("editing");
+        this.render();
+    };
+
     StepMapProjectView.prototype.editNextStepName = function () {
-        this.$('.step').addClass("editing");
+        this.$('.step .stepname').addClass("editing");
         this.$('.nextstep-name-input').focus();
     };
 
     StepMapProjectView.prototype.closeEditNextStepName = function () {
-        this.project.save({ "nextstep": { "name": this.$('.nextstep-name-input').val() } });
-        this.$('.step').removeClass("editing");
+        this.project.get("nextstep").name = this.$('.nextstep-name-input').val();
+        this.project.save();
+        this.$('.step .stepname').removeClass("editing");
+        this.render();
     };
 
     StepMapProjectView.prototype.editProjectName = function () {
