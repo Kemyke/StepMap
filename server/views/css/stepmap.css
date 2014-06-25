@@ -39,6 +39,13 @@ body {
 	color: #333333;
 }
 
+#logout {
+ position: fixed;
+  top: 0;
+  right: 0;
+
+}
+
 #project-list {
   position: fixed;
   bottom: 0;

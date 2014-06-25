@@ -236,7 +236,11 @@ var StepMapApp = (function () {
         this.coll = new Projects();
         var c = this.coll;
         this.coll.fetch({
-            success: function () {
+            success: function (collection, response, options) {
+                if (typeof (response.redirect) == 'string') {
+                    window.location = response.redirect;
+                }
+
                 for (var i = 0; i < 7; i++) {
                     try  {
                         var selectedItem = c.models.filter(function (item) {
@@ -262,6 +266,10 @@ var StepMapApp = (function () {
                         var x = 0;
                     }
                 }
+            },
+            error: function (collection, response, options) {
+                document.body.innerHTML = response.responseText;
+                console.log("error");
             }
         });
     }

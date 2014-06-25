@@ -1,6 +1,49 @@
-var restify = require('restify');  
-var server = restify.createServer();
-server.use(restify.bodyParser());
+var express = require('express');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var session = require('express-session')
+var serveStatic = require('serve-static')
+var ejs = require('ejs');
+ejs.open = '{{';
+ejs.close = '}}';
+
+var app = express();
+
+app.use(cookieParser()); // read cookies (needed for auth)
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json())
+
+app.set('view engine', 'html'); // set up ejs for templating
+app.engine('html', require('ejs').renderFile);
+
+app.use(session({ secret: 'epkhhubhccue' })); // session secret
+
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, done) {
+	  done(null, user);
+	});
+	 
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.use('local', new LocalStrategy(
+		  function(username, password, done) {
+		    if(username == 'kemy' && password == 'nemtommi')
+		    	{
+		    		return done(null, {id:1, username:'kemy'});
+		    	}
+		    else
+		    	{
+		    	return done(null, false);
+		    	}
+		    })
+		  );
+
 
 var mongoose = require('mongoose/');
 var config = require('./config');
@@ -62,14 +105,14 @@ function postProject(req, res, next) {
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   // Create a new message model, fill it up and save it to Mongodb
   var project = new Project();
-  project.id = req.params.id;
-  project.name = req.params.name;
-  project.position = req.params.position;
-  project.startdate = req.params.startdate;
-  project.badpoint = req.params.badpoint;
-  project.goodpoint = req.params.goodpoint;
-  project.nextstep = req.params.nextstep;
-  project.completedsteps = req.params.completedsteps;
+  project.id = req.body.id;
+  project.name = req.body.name;
+  project.position = req.body.position;
+  project.startdate = req.body.startdate;
+  project.badpoint = req.body.badpoint;
+  project.goodpoint = req.body.goodpoint;
+  project.nextstep = req.body.nextstep;
+  project.completedsteps = req.body.completedsteps;
   project.save(function () {
     res.send(project);
   });
@@ -91,15 +134,15 @@ function putProject(req, res, next) {
 	  res.header("Access-Control-Allow-Origin", "*");
 	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
 	  // Create a new message model, fill it up and save it to Mongodb
-	  Project.findOne({_id: req.params._id}, function(err, mymodel) {
-		  mymodel.id = req.params.id;
-		  mymodel.name = req.params.name;
-		  mymodel.position = req.params.position;
-		  mymodel.startdate = req.params.startdate;
-		  mymodel.badpoint = req.params.badpoint;
-		  mymodel.goodpoint = req.params.goodpoint;
-		  mymodel.nextstep = req.params.nextstep;
-		  mymodel.completedsteps = req.params.completedsteps;
+	  Project.findOne({_id: req.body._id}, function(err, mymodel) {
+		  mymodel.id = req.body.id;
+		  mymodel.name = req.body.name;
+		  mymodel.position = req.body.position;
+		  mymodel.startdate = req.body.startdate;
+		  mymodel.badpoint = req.body.badpoint;
+		  mymodel.goodpoint = req.body.goodpoint;
+		  mymodel.nextstep = req.body.nextstep;
+		  mymodel.completedsteps = req.body.completedsteps;
 		  mymodel.save(function () {
 	    res.send(req.body);
 	  });
@@ -107,9 +150,65 @@ function putProject(req, res, next) {
 }
 
 // Set up our routes and start the server
-server.get('/projects', getProjects);
-server.post('/projects', postProject);
-server.del('/projects/:_id', delProject);
-server.put('/projects/:_id', putProject);
-server.listen(8080);
+app.get('/', function(req, res) {
+		res.render('index.html');
+		
+	});
+app.get('/projects', isLoggedIn, getProjects);
+app.post('/projects', postProject);
+app.delete('/projects/:_id', delProject);
+app.put('/projects/:_id', putProject);
+
+app.use(serveStatic('./views', {'index': ['default.html', 'default.htm']}))
+
+app.listen(8080);
+
+function isLoggedIn(req, res, next) {
+
+	// if user is authenticated in the session, carry on 
+	if (req.isAuthenticated())
+		return next();
+
+	// if they aren't redirect them to the home page
+	res.send({redirect: '/login'});
+}
+
+//POST /login
+var loginRoute = function(req, res, next) {
+    // The local login strategy
+    passport.authenticate('local', function(err, user) {
+        if (err) {
+            return next(err);
+        }
+ 
+        // Technically, the user should exist at this point, but if not, check
+        if(user) {
+		// Log the user in!
+		req.logIn(user, function(err) {
+		    if (err) { 
+		        return next(err);
+		    }
+		    console.log(req.isAuthenticated());
+		    req.session.user_id = req.user.id;
+		     
+		    res.redirect('/');
+		});
+	}
+	else
+	{
+		res.redirect('/');
+	}
+ 
+    })(req, res, next);
+};
+
+app.post('/login', loginRoute);
+app.get('/login', function(req, res) {
+		res.render('login.html');
+		
+	});
+app.get('/logout', function(req, res) {
+	req.logout();
+	res.redirect('/login');
+});
 
