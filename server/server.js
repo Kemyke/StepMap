@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var session = require('express-session')
 var serveStatic = require('serve-static')
+var crypto = require('crypto');
 var ejs = require('ejs');
 ejs.open = '{{';
 ejs.close = '}}';
@@ -33,14 +34,25 @@ passport.deserializeUser(function(user, done) {
 
 passport.use('local', new LocalStrategy(
 		  function(username, password, done) {
-		    if(username == 'kemy' && password == 'nemtommi')
-		    	{
-		    		return done(null, {id:1, username:'kemy'});
-		    	}
-		    else
-		    	{
-		    	return done(null, false);
-		    	}
+			var pwdhash = crypto.createHash('md5').update(password).digest('hex');
+			var us = User.findOne({email: username, pwdhash: pwdhash});
+			if(us)
+			{
+				us.exec(function (arr,data) {
+						if(data)
+						{
+					      		return done(null, {id:data._id, username:data.email});
+						}
+						else
+						{
+							return done(null, false);	
+						}
+					  	});
+			}
+			else
+			{
+	    			return done(null, false);
+			}
 		    })
 		  );
 
@@ -52,6 +64,7 @@ Schema = mongoose.Schema;
 
 // Create a schema for our data
 var ProjectSchema = new Schema({
+  userid: String,
   position: Number,
   name: String,
   startdate: Date,    
@@ -74,9 +87,20 @@ var ProjectSchema = new Schema({
 	   }
 
 });
+
+// Create a schema for our data
+var UserSchema = new Schema({
+  email: String,
+  pwdhash: String,
+  lastlogin: Date
+});
+
 // Use the schema to register a model with MongoDb
 mongoose.model('Project', ProjectSchema); 
 var Project = mongoose.model('Project'); 
+
+mongoose.model('User', UserSchema); 
+var User = mongoose.model('User'); 
 
 function getProjects(req, res, next) {
   // Resitify currently has a bug which doesn't allow you to set default headers
@@ -86,7 +110,7 @@ function getProjects(req, res, next) {
   // .find() without any arguments, will return all results
   // the `-1` in .sort() means descending order
   
-  var ps = Project.find().sort('id');
+  var ps = Project.find({userid: req.user.id}).sort('id');
 
   if(ps)
   {  
@@ -106,6 +130,7 @@ function postProject(req, res, next) {
   // Create a new message model, fill it up and save it to Mongodb
   var project = new Project();
   project.id = req.body.id;
+  project.userid = req.user.id;
   project.name = req.body.name;
   project.position = req.body.position;
   project.startdate = req.body.startdate;
