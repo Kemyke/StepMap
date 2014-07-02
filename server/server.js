@@ -237,3 +237,27 @@ app.get('/logout', function(req, res) {
 	res.redirect('/login');
 });
 
+function postSignup(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  // Create a new message model, fill it up and save it to Mongodb
+  if(req.body.password == req.body.passwordcheck)
+  {
+	  var user = new User();
+	  user.email = req.body.email;
+	  var pwdhash = crypto.createHash('md5').update(req.body.password).digest('hex');
+	  user.pwdhash = pwdhash;
+	  user.save(function () {
+	    res.redirect('/login');
+	  });
+  }
+  else
+  {
+	res.redirect('/signup');
+  }
+}
+
+app.post('/signup', postSignup);
+app.get('/signup', function(req, res) {
+		res.render('signup.html');
+});
