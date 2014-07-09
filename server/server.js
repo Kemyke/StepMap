@@ -4,6 +4,8 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session')
 var serveStatic = require('serve-static')
 var crypto = require('crypto');
+var schedule = require('node-schedule');
+var nodemailer = require("nodemailer");
 var ejs = require('ejs');
 ejs.open = '{{';
 ejs.close = '}}';
@@ -160,6 +162,7 @@ function putProject(req, res, next) {
 	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
 	  // Create a new message model, fill it up and save it to Mongodb
 	  Project.findOne({_id: req.body._id}, function(err, mymodel) {
+
 		  mymodel.id = req.body.id;
 		  mymodel.name = req.body.name;
 		  mymodel.position = req.body.position;
@@ -261,3 +264,91 @@ app.post('/signup', postSignup);
 app.get('/signup', function(req, res) {
 		res.render('signup.html');
 });
+
+var rule = new schedule.RecurrenceRule();
+rule.hour = 8;
+rule.minute = 0;
+
+var j = schedule.scheduleJob(rule, function(){
+
+	getProjectToSendEmail(function(data, messagetype) {
+		for(var project in data) {
+			sendEmailNotificationToUser(project, messagetype);
+		}
+	});
+});
+
+
+function sendEmailNotificationToUser(project, messagetype) {
+	
+	var us = User.findOne({_id: project.userid});
+	if(us)
+	{
+		us.exec(function (arr,data) {
+			var message = getMessageFromMessageType(messagetype);
+			sendEmail(data.email, message);
+		});
+	}
+}
+
+function getMessageFromMessageType(messagetype) {
+ return "You are lazy!";
+}
+
+function sendEmail(address, message) {
+
+	// setup e-mail data with unicode symbols
+	var mailOptions = {
+	    from: "Stepmap ✔ <stepmap.notification@gmail.com>", // sender address
+	    to: address, // list of receivers
+	    subject: "Project notification ✔", // Subject line
+	    text: message, // plaintext body
+	    html: message // html body
+	}
+
+	// send mail with defined transport object
+	smtpTransport.sendMail(mailOptions, function(error, response){
+	if(error){
+		console.log(error);
+	}else{
+		console.log("Message sent: " + response.message);
+	}
+	});
+}
+
+function getProjectToSendEmail(completed) {
+
+	var firstCheck = new Date();
+	var numberOfDaysToAdd = 3;
+	firstCheck.setDate(firstCheck.getDate() + numberOfDaysToAdd); 
+	firstCheck.setHours(0,0,0,0);
+	var ps = Project.find({'nextstep.deadline': firstCheck})
+
+	if(ps)
+	{  
+		ps.exec(function (arr,data) {
+			completed(data, 'first mail');
+		});
+	}
+	else
+	{
+		console.log("Zero first notification sent!");
+	}
+}
+
+// create reusable transport method (opens pool of SMTP connections)
+var smtpTransport = nodemailer.createTransport("SMTP",{
+    service: "Gmail",
+    auth: {
+        user: "stepmap.notification@gmail.com",
+        pass: "nemtommi12"
+    }
+});
+
+
+getProjectToSendEmail(function(data, messagetype) {
+	for(var project in data) {
+		sendEmailNotificationToUser(data[project], messagetype);
+	}
+	});
+
