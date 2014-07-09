@@ -340,8 +340,12 @@ function getProjectToSendEmail(completed) {
 var smtpTransport = nodemailer.createTransport("SMTP",{
     service: "Gmail",
     auth: {
-        user: "stepmap.notification@gmail.com",
-        pass: "nemtommi12"
+        XOAuth2: {
+            user: "stepmap.notification@gmail.com",
+            clientId: "722698500997-qsoun6isuvph7tq38mvnjuvq12of9t30.apps.googleusercontent.com",
+            clientSecret: "qPWRAObodOH36Nm8u_ufpPV9",
+            refreshToken: "1/ZfXzHnitbpu4DBNuYRYUfFjF_taLUrYEK_a5wh5e1lQ"
+        }
     }
 });
 
