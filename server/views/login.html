@@ -1,14 +1,23 @@
-<form action="/login" method="post">
+  <head>
+    <title>Step Map Login</title>
+    <link href="css/stepmap.css" media="all" rel="stylesheet" type="text/css"/>
+  </head>
+<div id="login-body">
+<div id="login-box">
+    <img id="login-logo" src="images/login_logo_img.png" width="204" height="29" alt="Stepmap logo" title="Stepmap logo"/>
+    <form action="/login" method="post">
     <div>
-        <label>Username:</label>
-        <input type="text" name="username"/>
+        <img src="images/username_img.png">
+        <input type="text" id="usrname" name="username" value="Felhasználónév" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;"/>
+    </div>
+    <div >
+        <img src="images/pass_img.png">
+        <input type="password" id="pswd" name="password" value="Jelszó" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;"/>
     </div>
     <div>
-        <label>Password:</label>
-        <input type="password" name="password"/>
-    </div>
-    <div>
-        <input type="submit" value="Log In"/>
+        <input type="submit" value="Bejelentkezek!" />
     </div>
 </form>
- <a href="signup">signup</a>
+ <a id="signup" href="signup">Regisztrálok</a>
+</div>
+</div>

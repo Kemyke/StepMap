@@ -1,17 +1,25 @@
+  <head>
+    <title>Regisztráció</title>
+    <link href="css/stepmap.css" media="all" rel="stylesheet" type="text/css"/>
+  </head>
+<div id="signup-body">
+<div id="signup-box">
+        <img id="signup-logo" src="images/login_logo_img.png" width="204" height="29" alt="Stepmap logo" title="Stepmap logo"/>
 <form action="/signup" method="post">
     <div>
-        <label>Email:</label>
-        <input type="text" name="email"/>
-    </div>
-    <div>
-        <label>Password:</label>
-        <input type="password" name="password"/>
-    </div>
-    <div>
-        <label>Password again:</label>
-        <input type="password" name="passwordcheck"/>
+        <input type="text" name="email" value="Email" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;"/>
     </div>
     <div>
         <input type="submit" value="Register"/>
     </div>
+        <div>
+            <div class="password">
+        <input class="passwd" type="password" name="password" value="Jelszó" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;"/>
+    </div>
+    <div>
+        <input class="passwd" type="password" name="passwordcheck" value="Jelszó újra" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;"/>
+    </div>
+</div>
 </form>
+</div>
+</div>

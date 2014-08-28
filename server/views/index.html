@@ -13,29 +13,13 @@
   </head>
 
   <body>
-  <a id="logout" href="logout">logout</a>
+    <div id="main">
+    <div id="header"><p>Projekt</p><p>Next Step</p></div>
   <ul id="project-list"></ul>
+  <div id="sidebar"><h1>StepMap</h1><img id="logo" src="/images/stepmap_logo_kis_img.png"><p>Üdvözlünk!</p><a id="logout" href="logout">Kijelentkezés</a></div>
+  </div>
   <script type="text/template" id="project-template">
-      <div class="step" style="border: 1px solid yellow;position: relative;top: -<%= progresswidth %>px;">
-      	<div class="stepname">
-      	  <div class="display">		      
-          	<label id="nextStep"><%= nextstep %></label>
-          </div>
-          <div class="edit">
-  			<input class="nextstep-name-input" type="text" value="<%= nextstep %>" />
-		  </div>
-		</div>
-		<div class="stepdeadline">  
-		  <div class="display">
-          	<label id="deadline"><%= deadline %></label>
-          </div>	
-          <div class="edit">
-  			<input class="nextstep-deadline-input" type="text" type="text" id="datepicker" value="<%= deadline %>" />
-		  </div>
-        </div>
-        <button id="closeStep">Close step</button>
-      </div>
-      <div class="project" style="border: 1px solid green;position: relative;top: -<%= progresswidth %>px;">
+      <div class="project" style="position: relative; ">
       	  <div class="display">
             <label id="project-name"><%= projectname %></label>
           </div>
@@ -43,15 +27,41 @@
   			<input class="project-name-input" type="text" value="<%= projectname %>" />
 		  </div>
 		  
-          <button id="terminate">Terminate</button>
-          <label id="days"><%= days %>d</label>
-          <label id="goods" style="color: green;"><%= goods %></label>
-          <label id="bads" style="color: red;"><%= bads %></label>
-      </div>      
+          <button id="terminate"></button>
+      </div>
+      <div class="step-out" style="background-position:  -<%= (200-progresswidth) %>px 0;">
+      <div class="step" style="position: relative;right: -<%= progresswidth %>px;">
+        <div class="stepname">
+          <div class="display">
+            <label id="nextStep"><%= nextstep %></label>
+          </div>
+          <div class="edit">
+        <input class="nextstep-name-input" type="text" value="<%= nextstep %>" />
+      </div>
+    </div>
+    <div class="stepdeadline">  
+      <div class="display">
+            <label id="deadline"><%= deadline %></label>
+          </div>  
+          <div class="edit">
+        <input class="nextstep-deadline-input" type="text" type="text" id="datepicker" value="<%= deadline %>" />
+      </div>
+        </div>
+        <button id="closeStep"></button>
+      </div>
+
+</div>
+
+        <div class="vote" style="position: relative;right: -<%= progresswidth %>px;">
+          <label id="days" style="color: #9f9fb0;position: relative; top:67px; left: 105px;"><%= days %></label>
+          <label id="goods" style="color: #ef4035;position: relative; top:12px; left: 83px;"><%= goods %></label>
+          <label id="bads" style="color: #ef4035; position: relative; top:67px; left: 20px;font-family: 'bignoodletitlingregular';"><%= bads %></label>
+        </div>
+        
     </script>
     
      <script type="text/template" id="new-project-template">
-  	  <button id="newProject">New project</button>
+  	  <button id="newProject"></button>
     </script>
     
   </body>
